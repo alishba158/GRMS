@@ -1,0 +1,410 @@
+{% extends 'supervisor/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Supervisor{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Main container */
+    .dashboard-container {
+        padding: 0 5px;
+    }
+    
+    /* Stats Cards - 4 in a row */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-left: 3px solid;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1b5e20;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #555;
+    }
+    
+    /* Three cards row - ALWAYS 3 columns on desktop AND mobile */
+    .row-3-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    /* Two cards row */
+    .row-2-cards {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    /* Common card styles */
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .card-title {
+        padding: 10px 15px;
+        background: #f5f5f5;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .card-content {
+        padding: 10px 15px;
+        min-height: 100px;
+    }
+    
+    .view-link {
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: #2e7d32;
+        text-decoration: none;
+        background: #e8f5e9;
+        padding: 3px 10px;
+        border-radius: 20px;
+    }
+    
+    .empty-msg {
+        text-align: center;
+        padding: 15px;
+        color: #999;
+        font-size: 0.75rem;
+    }
+    
+    .list-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        font-size: 0.75rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .badge-pending {
+        background: #ffc107;
+        color: #1e3a1e;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.6rem;
+    }
+    
+    .badge-info {
+        background: #17a2b8;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 0.6rem;
+    }
+    
+    /* Quick actions */
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-top: 10px;
+    }
+    
+    .action-btn {
+        background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 0.7rem;
+        text-decoration: none;
+        transition: 0.2s;
+        display: block;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    /* Welcome message */
+    .welcome-box {
+        background: white;
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .welcome-box h3 {
+        margin: 0 0 5px 0;
+        color: #1b5e20;
+        font-size: 1.2rem;
+    }
+    .welcome-box p {
+        margin: 0;
+        color: #666;
+        font-size: 0.85rem;
+    }
+    
+    /* ===== MOBILE RESPONSIVE - Keep 3 cards in a row ===== */
+    @media (max-width: 768px) {
+        /* Stats row: 2 columns on mobile (better for small screens) */
+        .stats-row {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        /* 3 cards row: tetap 3 kolom (agar HP lebar >= 400px) */
+        .row-3-cards {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        /* 2 cards row: tetap 2 kolom */
+        .row-2-cards {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        /* Quick actions: 2 columns on mobile */
+        .quick-actions {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        /* Smaller font on mobile */
+        .stat-value {
+            font-size: 1.1rem;
+        }
+        
+        .stat-label {
+            font-size: 0.65rem;
+        }
+        
+        .card-title {
+            font-size: 0.7rem;
+            flex-direction: column;
+            text-align: center;
+            gap: 5px;
+        }
+        
+        .view-link {
+            font-size: 0.55rem;
+        }
+        
+        .empty-msg {
+            font-size: 0.65rem;
+            padding: 10px;
+        }
+        
+        .list-row {
+            font-size: 0.65rem;
+            flex-direction: column;
+            text-align: center;
+            gap: 5px;
+        }
+        
+        .welcome-box h3 {
+            font-size: 1rem;
+        }
+        
+        .welcome-box p {
+            font-size: 0.75rem;
+        }
+    }
+    
+    /* Untuk HP yang sangat kecil (lebar < 400px) - 3 kolom mungkin terlalu sempit */
+    @media (max-width: 480px) {
+        .row-3-cards {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .quick-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+
+    <!-- Welcome Message -->
+    <div class="welcome-box">
+        <h3>Welcome back, {{ supervisor.user.get_full_name|default:request.user.username }}!</h3>
+        <p>Manage your students' research progress</p>
+    </div>
+
+    <!-- Stats Row - 4 Cards -->
+    <div class="stats-row">
+        <div class="stat-card" style="border-left-color: #2e7d32;">
+            <div class="stat-value">{{ total_students|default:0 }}</div>
+            <div class="stat-label">Students</div>
+            <small style="font-size: 0.6rem; color: #777;">Assigned to you</small>
+        </div>
+        <div class="stat-card" style="border-left-color: #e67e22;">
+            <div class="stat-value">{{ pending_synopses|default:0 }}</div>
+            <div class="stat-label">Pending Synopsis</div>
+            <a href="{% url 'supervisor_synopsis_list' %}?status=submitted" class="view-link" style="margin-top: 5px; display: inline-block;">Review →</a>
+        </div>
+        <div class="stat-card" style="border-left-color: #e74c3c;">
+            <div class="stat-value">{{ pending_theses|default:0 }}</div>
+            <div class="stat-label">Pending Thesis</div>
+            <a href="{% url 'supervisor_thesis_list' %}?status=Submitted" class="view-link" style="margin-top: 5px; display: inline-block;">View →</a>
+        </div>
+        <div class="stat-card" style="border-left-color: #3498db;">
+            <div class="stat-value">{{ pending_reports|default:0 }}</div>
+            <div class="stat-label">Pending Reports</div>
+            <a href="{% url 'supervisor_progress_list' %}?status=Submitted" class="view-link" style="margin-top: 5px; display: inline-block;">Review →</a>
+        </div>
+    </div>
+
+    <!-- Row 1: 3 Cards (Recent Synopsis + Notifications + Upcoming Meetings) -->
+    <div class="row-3-cards">
+        <!-- Recent Synopsis Card -->
+        <div class="info-card">
+            <div class="card-title">
+                <span>📄 Recent Synopsis</span>
+                <a href="{% url 'supervisor_synopsis_list' %}" class="view-link">View All →</a>
+            </div>
+            <div class="card-content">
+                {% if recent_synopses %}
+                    {% for syn in recent_synopses|slice:":3" %}
+                    <div class="list-row">
+                        <span><strong>{{ syn.student.user.get_full_name }}</strong><br><small>{{ syn.title|truncatechars:20 }}</small></span>
+                        <span class="badge-pending">{{ syn.get_status_display }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-msg">No synopsis activity</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Notifications Card -->
+        <div class="info-card">
+            <div class="card-title">
+                <span>🔔 Notifications</span>
+                <a href="{% url 'all_notifications' %}" class="view-link">View All →</a>
+            </div>
+            <div class="card-content">
+                {% if unread_notifications %}
+                    {% for notif in unread_notifications|slice:":3" %}
+                    <div class="list-row">
+                        <span>{{ notif.message|truncatechars:30 }}</span>
+                    </div>
+                    {% endfor %}
+                    {% if unread_count > 0 %}
+                        <a href="{% url 'mark_all_read' %}" class="view-link" style="margin-top: 8px; display: inline-block;">Mark all read →</a>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-msg">No new notifications</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Upcoming Meetings Card -->
+        <div class="info-card">
+            <div class="card-title">
+                <span>📅 Upcoming Meetings</span>
+                <a href="{% url 'supervisor_meeting_create' %}" class="view-link">Schedule →</a>
+            </div>
+            <div class="card-content">
+                {% if upcoming_meetings %}
+                    {% for meeting in upcoming_meetings|slice:":3" %}
+                    <div class="list-row">
+                        <span><strong>{{ meeting.student.user.get_full_name }}</strong><br><small>{{ meeting.meeting_date|date:"M d, H:i" }}</small></span>
+                        <span class="badge-info">{{ meeting.mode }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-msg">No upcoming meetings</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: 2 Cards (Extension Requests + Recent Thesis) -->
+    <div class="row-2-cards">
+        <!-- Extension Requests Card -->
+        <div class="info-card">
+            <div class="card-title">
+                <span>⏰ Extension Requests</span>
+                <a href="{% url 'supervisor_extension_list' %}" class="view-link">View All →</a>
+            </div>
+            <div class="card-content">
+                {% if recent_extensions %}
+                    {% for ext in recent_extensions|slice:":3" %}
+                    <div class="list-row">
+                        <span><strong>{{ ext.student.user.get_full_name }}</strong><br><small>{{ ext.requested_duration }} days</small></span>
+                        <span class="badge-pending">{{ ext.status }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-msg">No extension requests</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Thesis Card -->
+        <div class="info-card">
+            <div class="card-title">
+                <span>📚 Recent Thesis</span>
+                <a href="{% url 'supervisor_thesis_list' %}" class="view-link">View All →</a>
+            </div>
+            <div class="card-content">
+                {% if recent_theses %}
+                    {% for thesis in recent_theses|slice:":3" %}
+                    <div class="list-row">
+                        <span><strong>{{ thesis.student.user.get_full_name }}</strong><br><small>{{ thesis.title|truncatechars:20 }}</small></span>
+                        <span class="badge-pending">{{ thesis.status }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-msg">No thesis yet</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="info-card">
+        <div class="card-title">
+            <span>⚡ Quick Actions</span>
+        </div>
+        <div class="card-content">
+            <div class="quick-actions">
+                <a href="{% url 'supervisor_meeting_create' %}" class="action-btn">📅 Schedule</a>
+                <a href="{% url 'supervisor_synopsis_list' %}?status=submitted" class="action-btn">📄 Review</a>
+                <a href="{% url 'supervisor_extension_list' %}?status=Pending" class="action-btn">⏰ Extensions</a>
+                <a href="{% url 'supervisor_thesis_list' %}?status=Submitted" class="action-btn">📚 Thesis</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

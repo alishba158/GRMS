@@ -1,0 +1,176 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Admin{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Professional Card Styles */
+    .stat-card-modern {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 4px solid;
+        cursor: pointer;
+    }
+    
+    .stat-card-modern:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    
+    /* Professional View All Button */
+    .view-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        padding: 6px 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #2e7d32;
+        background: #e8f5e9;
+        text-decoration: none;
+        border-radius: 20px;
+        transition: all 0.2s ease;
+    }
+    
+    .view-link i {
+        font-size: 0.65rem;
+        transition: transform 0.2s ease;
+    }
+    
+    .view-link:hover {
+        background: #2e7d32;
+        color: white;
+    }
+    
+    .view-link:hover i {
+        transform: translateX(3px);
+    }
+    
+    /* Quick Action Buttons */
+    .quick-action-btn {
+        background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        color: white;
+        padding: 12px;
+        border-radius: 12px;
+        text-align: center;
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: block;
+        font-weight: 500;
+    }
+    
+    .quick-action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(46,125,50,0.3);
+    }
+    
+    /* Grid Layouts */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .stats-grid-2 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .stats-grid, .stats-grid-2, .quick-actions-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- Welcome Message -->
+<div class="welcome-message" data-aos="fade-up">
+    <h3>Welcome back, Admin!</h3>
+    <p>Manage all research activities from one place</p>
+</div>
+
+<!-- Stats Row 1 -->
+<div class="stats-grid">
+    <div class="stat-card-modern" style="border-left-color: #2e7d32;">
+        <div style="font-size: 2rem; font-weight: 700; color: #1b5e20;">{{ total_students }}</div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: #555;">Total Students</div>
+        <small style="font-size: 0.7rem; color: #777;">Active: {{ active_students }}</small>
+    </div>
+    
+    <div class="stat-card-modern" style="border-left-color: #4caf50;">
+        <div style="font-size: 2rem; font-weight: 700; color: #1b5e20;">{{ total_supervisors }}</div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: #555;">Supervisors</div>
+        <small style="font-size: 0.7rem; color: #777;">Available: {{ available_supervisors }}</small>
+    </div>
+    
+    <div class="stat-card-modern" style="border-left-color: #e67e22;">
+        <div style="font-size: 2rem; font-weight: 700; color: #1b5e20;">{{ pending_synopses }}</div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: #555;">Pending Synopsis</div>
+        <small style="font-size: 0.7rem; color: #777;">Submitted: {{ pending_synopses_submitted|default:0 }} | Under Review: {{ pending_synopses_review|default:0 }}</small>
+        <a href="{% url 'admin_synopsis_list' %}?status=Pending" class="view-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    
+    <div class="stat-card-modern" style="border-left-color: #e74c3c;">
+        <div style="font-size: 2rem; font-weight: 700; color: #1b5e20;">{{ pending_theses }}</div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: #555;">Pending Thesis</div>
+        <a href="{% url 'admin_thesis_list' %}?status=Submitted" class="view-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+</div>
+
+<!-- Stats Row 2 -->
+<div class="stats-grid-2">
+    <div class="stat-card-modern" style="border-left-color: #3498db;">
+        <div style="font-size: 2rem; font-weight: 700; color: #1b5e20;">{{ pending_extensions }}</div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: #555;">Extension Requests</div>
+        <small style="font-size: 0.7rem; color: #777;">Urgent: {{ urgent_extensions }}</small>
+        <a href="{% url 'admin_extension_list' %}?status=Pending" class="view-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    
+    <div class="stat-card-modern" style="border-left-color: #9b59b6;">
+        <div style="font-size: 2rem; font-weight: 700; color: #1b5e20;">{{ pending_degree_requests }}</div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: #555;">Degree Requests</div>
+        <small style="font-size: 0.7rem; color: #777;">Pending verification</small>
+        <a href="{% url 'admin_degree_list' %}?status=Pending" class="view-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    
+    <div class="stat-card-modern" style="border-left-color: #3498db;">
+        <div style="font-size: 2rem; font-weight: 700; color: #1b5e20;">{{ unread_count }}</div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: #555;">Notifications</div>
+        <a href="{% url 'all_notifications' %}" class="view-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card mt-3">
+    <div class="card-header">
+        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+    </div>
+    <div class="card-body">
+        <div class="quick-actions-grid">
+            <a href="{% url 'admin_student_create' %}" class="quick-action-btn">➕ Add Student</a>
+            <a href="{% url 'admin_supervisor_create' %}" class="quick-action-btn">👤 Add Supervisor</a>
+            <a href="{% url 'admin_synopsis_list' %}?status=Pending" class="quick-action-btn">📄 Pending Synopsis ({{ pending_synopses }})</a>
+            <a href="{% url 'admin_extension_list' %}?status=Pending" class="quick-action-btn">⏰ Extensions ({{ pending_extensions }})</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,592 @@
+{% extends 'student/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Student{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Stats Cards */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-left: 3px solid;
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1b5e20;
+    }
+    .stat-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 5px;
+    }
+    
+    /* Profile Card */
+    .profile-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+        overflow: hidden;
+        border: 1px solid #e8f5e9;
+    }
+    .profile-card .card-header {
+        background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        color: white;
+        padding: 15px 20px;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    .profile-card .card-header i {
+        color: #c6a15b;
+        margin-right: 8px;
+    }
+    .profile-body {
+        padding: 20px;
+    }
+    .profile-summary {
+        text-align: center;
+        padding: 10px;
+    }
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+    }
+    .profile-avatar i {
+        font-size: 2.5rem;
+        color: #c6a15b;
+    }
+    .profile-summary h4 {
+        margin: 5px 0;
+        color: #1b5e20;
+        font-size: 1.1rem;
+    }
+    .profile-summary p {
+        color: #666;
+        font-size: 0.8rem;
+        margin-bottom: 15px;
+    }
+    .view-profile-btn {
+        background: #2e7d32;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: 0.2s;
+    }
+    .view-profile-btn:hover {
+        background: #c6a15b;
+        transform: translateY(-2px);
+    }
+    
+    /* Cards Grid */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    .card-header {
+        padding: 10px 12px;
+        background: #f5f5f5;
+        font-weight: 600;
+        font-size: 0.8rem;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .card-body {
+        padding: 8px 12px;
+        text-align: center;
+    }
+    .view-link {
+        display: inline-block;
+        font-size: 0.6rem;
+        font-weight: 600;
+        color: #2e7d32;
+        text-decoration: none;
+        background: #e8f5e9;
+        padding: 2px 8px;
+        border-radius: 20px;
+        transition: 0.2s;
+        margin-top: 8px;
+    }
+    .view-link:hover {
+        background: #2e7d32;
+        color: white;
+    }
+    .badge-pending {
+        background: #ffc107;
+        color: #1e3a1e;
+        padding: 2px 6px;
+        border-radius: 20px;
+        font-size: 0.55rem;
+        display: inline-block;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 10px;
+        color: #999;
+        font-size: 0.7rem;
+    }
+    .card-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1b5e20;
+        margin: 5px 0;
+    }
+    .card-status {
+        font-size: 0.7rem;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    
+    /* Degree Letter Card */
+    .degree-card {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+    }
+    .degree-card .card-header {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    .degree-card .view-link {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+    .degree-card .view-link:hover {
+        background: white;
+        color: #8e44ad;
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-top: 5px;
+    }
+    .action-btn {
+        background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        color: white;
+        padding: 8px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 0.65rem;
+        text-decoration: none;
+        transition: 0.2s;
+        display: block;
+    }
+    .action-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .welcome-box {
+        background: white;
+        padding: 12px 15px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+    .welcome-box h3 {
+        margin: 0 0 3px 0;
+        color: #1b5e20;
+        font-size: 1.1rem;
+    }
+    
+    /* Profile Modal */
+    .profile-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+    }
+    .profile-modal-content {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 85vh;
+        overflow-y: auto;
+        animation: modalSlideIn 0.3s ease;
+    }
+    @keyframes modalSlideIn {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .profile-modal-header {
+        background: linear-gradient(135deg, #2e7d32, #1b5e20);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+    }
+    .profile-modal-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+    .close-modal {
+        font-size: 1.8rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .close-modal:hover {
+        color: #c6a15b;
+    }
+    .profile-modal-body {
+        padding: 20px;
+    }
+    .profile-modal-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    .profile-modal-field {
+        flex: 1;
+        min-width: 200px;
+    }
+    .profile-modal-field label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #888;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    .profile-modal-field p {
+        background: #f0f7f0;
+        padding: 8px 12px;
+        border-radius: 10px;
+        color: #1b5e20;
+        font-weight: 500;
+        margin: 0;
+    }
+    .profile-modal-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+    .modal-update-btn, .modal-password-btn {
+        flex: 1;
+        padding: 10px;
+        border-radius: 30px;
+        text-decoration: none;
+        text-align: center;
+        font-size: 0.8rem;
+        transition: 0.2s;
+    }
+    .modal-update-btn {
+        background: #2e7d32;
+        color: white;
+    }
+    .modal-update-btn:hover {
+        background: #1b5e20;
+        transform: translateY(-2px);
+    }
+    .modal-password-btn {
+        background: #f0f7f0;
+        color: #2e7d32;
+        border: 1px solid #2e7d32;
+    }
+    .modal-password-btn:hover {
+        background: #2e7d32;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .stats-row, .quick-actions {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .profile-modal-row {
+            flex-direction: column;
+        }
+        .profile-modal-actions {
+            flex-direction: column;
+        }
+        .card-number {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+
+    <!-- Welcome Message -->
+    <div class="welcome-box">
+        <h3>Welcome back, {{ student.user.get_full_name|default:request.user.username }}!</h3>
+        <p>Track your research progress and manage your academic journey</p>
+    </div>
+
+    <!-- Profile Management Card -->
+    <div class="profile-card">
+        <div class="card-header">
+            <i class="fas fa-user-circle"></i> Profile Management
+        </div>
+        <div class="profile-body" style="text-align: center;">
+            <div class="profile-summary">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <h4>{{ student.user.get_full_name }}</h4>
+                <p>{{ student.registration_no }}</p>
+                <button class="view-profile-btn" onclick="openProfileModal()">
+                    <i class="fas fa-eye"></i> View Complete Profile
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="profile-modal">
+        <div class="profile-modal-content">
+            <div class="profile-modal-header">
+                <h3><i class="fas fa-user-circle"></i> Student Profile</h3>
+                <span class="close-modal" onclick="closeProfileModal()">&times;</span>
+            </div>
+            <div class="profile-modal-body">
+                <div class="profile-modal-row">
+                    <div class="profile-modal-field">
+                        <label>Full Name</label>
+                        <p>{{ student.user.get_full_name }}</p>
+                    </div>
+                    <div class="profile-modal-field">
+                        <label>Registration No</label>
+                        <p>{{ student.registration_no }}</p>
+                    </div>
+                </div>
+                <div class="profile-modal-row">
+                    <div class="profile-modal-field">
+                        <label>Department</label>
+                        <p>{{ student.department }}</p>
+                    </div>
+                    <div class="profile-modal-field">
+                        <label>Session</label>
+                        <p>{{ student.session }}</p>
+                    </div>
+                </div>
+                <div class="profile-modal-row">
+                    <div class="profile-modal-field">
+                        <label>Program</label>
+                        <p>{{ student.program }}</p>
+                    </div>
+                    <div class="profile-modal-field">
+                        <label>Enrollment Status</label>
+                        <p>{{ student.get_enrollment_status_display }}</p>
+                    </div>
+                </div>
+                <div class="profile-modal-row">
+                    <div class="profile-modal-field">
+                        <label>Supervisor</label>
+                        <p>{{ student.supervisor.user.get_full_name|default:"Not Assigned" }}</p>
+                    </div>
+                    <div class="profile-modal-field">
+                        <label>Admission Date</label>
+                        <p>{{ student.admission_date|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+                <div class="profile-modal-actions">
+                    <a href="{% url 'student_profile_update' %}" class="modal-update-btn">
+                        <i class="fas fa-edit"></i> Update Profile
+                    </a>
+                    <a href="{% url 'student_change_password' %}" class="modal-password-btn">
+                        <i class="fas fa-key"></i> Change Password
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-card" style="border-left-color: #2e7d32;">
+            <div class="stat-value">{{ total_reports|default:0 }}</div>
+            <div class="stat-label">Progress Reports</div>
+            <small>Total submitted</small>
+        </div>
+        <div class="stat-card" style="border-left-color: #e67e22;">
+            <div class="stat-value">{{ pending_reports|default:0 }}</div>
+            <div class="stat-label">Pending Reports</div>
+            <small>Awaiting review</small>
+        </div>
+        <div class="stat-card" style="border-left-color: #3498db;">
+            <div class="stat-value">{{ total_meetings|default:0 }}</div>
+            <div class="stat-label">Meetings</div>
+            <small>Total scheduled</small>
+        </div>
+        <div class="stat-card" style="border-left-color: #9b59b6;">
+            <div class="stat-value">{{ recent_extensions.count|default:0 }}</div>
+            <div class="stat-label">Extensions</div>
+            <a href="{% url 'student_extension_list' %}" class="view-link" style="margin-top: 5px;">View →</a>
+        </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="cards-grid">
+        <div class="card">
+            <div class="card-header">
+                <span>📄 Synopsis Status</span>
+                <a href="{% url 'student_synopsis_list' %}" class="view-link">View All →</a>
+            </div>
+            <div class="card-body">
+                {% with latest_synopsis=recent_synopses.first %}
+                    {% if latest_synopsis %}
+                        <div class="card-number">{{ recent_synopses.count }}</div>
+                        <div class="card-status">Synopsis submitted</div>
+                        <div class="badge-pending">{{ latest_synopsis.get_status_display }}</div>
+                    {% else %}
+                        <div class="empty-state">No synopsis submitted yet</div>
+                    {% endif %}
+                    <a href="{% url 'student_synopsis_submit' %}" class="view-link">Submit New →</a>
+                {% endwith %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span>📅 Upcoming Meetings</span>
+                <a href="{% url 'student_meeting_list' %}" class="view-link">View All →</a>
+            </div>
+            <div class="card-body">
+                <div class="card-number">{{ upcoming_meetings.count }}</div>
+                <div class="card-status">Upcoming meetings</div>
+                {% if not upcoming_meetings %}
+                    <div class="empty-state">No upcoming meetings</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span>⏰ Recent Extensions</span>
+                <a href="{% url 'student_extension_list' %}" class="view-link">View All →</a>
+            </div>
+            <div class="card-body">
+                <div class="card-number">{{ recent_extensions.count }}</div>
+                <div class="card-status">Extension requests</div>
+                <a href="{% url 'student_extension_create' %}" class="view-link">Request Extension →</a>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span>📚 Recent Thesis</span>
+                <a href="{% url 'student_thesis_list' %}" class="view-link">View All →</a>
+            </div>
+            <div class="card-body">
+                <div class="card-number">{{ recent_theses.count }}</div>
+                <div class="card-status">Thesis submitted</div>
+                <a href="{% url 'student_thesis_create' %}" class="view-link">Submit Thesis →</a>
+            </div>
+        </div>
+        <div class="card degree-card">
+            <div class="card-header">
+                <span>🎓 Degree Letter</span>
+                <a href="{% url 'student_degree_request' %}" class="view-link">Request →</a>
+            </div>
+            <div class="card-body">
+                {% if degree %}
+                    <div>Status: <strong>{{ degree.get_verification_status_display }}</strong></div>
+                    {% if degree.letter_file %}
+                        <a href="{{ degree.letter_file.url }}" class="view-link">Download PDF</a>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state" style="color: rgba(255,255,255,0.8);">Not requested yet</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <span>🔔 Notifications</span>
+                <a href="{% url 'all_notifications' %}" class="view-link">View All →</a>
+            </div>
+            <div class="card-body" style="text-align: center;">
+                <div class="card-number">{{ unread_count|default:0 }}</div>
+                <div class="card-status">Unread notifications</div>
+                {% if unread_count > 0 %}
+                    <a href="{% url 'mark_all_read' %}" class="view-link">Mark all read →</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+        <div class="card-header">
+            <span>⚡ Quick Actions</span>
+        </div>
+        <div class="card-body">
+            <div class="quick-actions">
+                <a href="{% url 'student_synopsis_submit' %}" class="action-btn">📄 Submit Synopsis</a>
+                <a href="{% url 'student_progress_create' %}" class="action-btn">📊 Submit Report</a>
+                <a href="{% url 'student_thesis_create' %}" class="action-btn">📚 Submit Thesis</a>
+                <a href="{% url 'student_extension_create' %}" class="action-btn">⏰ Request Extension</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== JAVASCRIPT - Add this at the end ===== -->
+<script>
+    function openProfileModal() {
+        document.getElementById('profileModal').style.display = 'flex';
+    }
+    function closeProfileModal() {
+        document.getElementById('profileModal').style.display = 'none';
+    }
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        var modal = document.getElementById('profileModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+
+{% endblock %}

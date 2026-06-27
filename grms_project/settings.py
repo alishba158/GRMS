@@ -8,6 +8,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-oplj3t*xfjiqk+1x%f=pc
 DEBUG = False
 
 ALLOWED_HOSTS = ['*', 'grms-production.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://grms-production.up.railway.app']
 
 INSTALLED_APPS = [
     'django.contrib.admin',

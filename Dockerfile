@@ -2,9 +2,6 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=grms_project.settings
-
 RUN apt-get update && apt-get install -y \
     default-libmysqlclient-dev \
     pkg-config \

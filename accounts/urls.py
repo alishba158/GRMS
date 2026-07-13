@@ -11,6 +11,12 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
 
     # ============================================
+    # ========== 🔐 FORGET PASSWORD (ADMIN MANUAL RESET) ==========
+    # ============================================
+    path('forget-password/', views.forget_password_request, name='forget_password'),
+    path('admin-panel-2026-secure/reset-password/<int:user_id>/', views.admin_reset_user_password, name='admin_reset_user_password'),
+
+    # ============================================
     # ========== 🔴 ADMIN PANEL URLs ==========
     # ============================================
 
@@ -35,37 +41,39 @@ urlpatterns = [
     path('admin-panel-2026-secure/supervisors/<int:pk>/delete/', views.admin_supervisor_delete, name='admin_supervisor_delete'),
 
     # ===== ADMIN SYNOPSIS MANAGEMENT (ENHANCED) =====
-path('admin-panel-2026-secure/synopsis/', views.admin_synopsis_list, name='admin_synopsis_list'),
-path('admin-panel-2026-secure/synopsis/<int:pk>/', views.admin_synopsis_detail, name='admin_synopsis_detail'),
-path('admin-panel-2026-secure/synopsis/upload/', views.admin_synopsis_upload, name='admin_synopsis_upload'),
-path('admin-panel-2026-secure/synopsis/<int:pk>/download/', views.admin_synopsis_download, name='admin_synopsis_download'),
-path('admin-panel-2026-secure/synopsis/<int:pk>/view-pdf/', views.admin_synopsis_view_pdf, name='admin_synopsis_view_pdf'),
-path('admin-panel-2026-secure/synopsis/<int:pk>/delete/', views.admin_synopsis_delete_confirm, name='admin_synopsis_delete'),
-path('admin-panel-2026-secure/synopsis/<int:pk>/assign/', views.admin_synopsis_assign, name='admin_synopsis_assign'),
-path('admin-panel-2026-secure/synopsis/<int:pk>/approve/', views.admin_synopsis_approve, name='admin_synopsis_approve'),
-path('admin-panel-2026-secure/synopsis/<int:pk>/reject/', views.admin_synopsis_reject, name='admin_synopsis_reject'),
+    path('admin-panel-2026-secure/synopsis/', views.admin_synopsis_list, name='admin_synopsis_list'),
+    path('admin-panel-2026-secure/synopsis/<int:pk>/', views.admin_synopsis_detail, name='admin_synopsis_detail'),
+    path('admin-panel-2026-secure/synopsis/upload/', views.admin_synopsis_upload, name='admin_synopsis_upload'),
+    path('admin-panel-2026-secure/synopsis/<int:pk>/download/', views.admin_synopsis_download, name='admin_synopsis_download'),
+    path('admin-panel-2026-secure/synopsis/<int:pk>/view-pdf/', views.admin_synopsis_view_pdf, name='admin_synopsis_view_pdf'),
+    path('admin-panel-2026-secure/synopsis/<int:pk>/delete/', views.admin_synopsis_delete_confirm, name='admin_synopsis_delete'),
+    path('admin-panel-2026-secure/synopsis/<int:pk>/assign/', views.admin_synopsis_assign, name='admin_synopsis_assign'),
+    path('admin-panel-2026-secure/synopsis/<int:pk>/approve/', views.admin_synopsis_approve, name='admin_synopsis_approve'),
+    path('admin-panel-2026-secure/synopsis/<int:pk>/reject/', views.admin_synopsis_reject, name='admin_synopsis_reject'),
 
-   # ===== ADMIN THESIS MANAGEMENT (ENHANCED) =====
-path('admin-panel-2026-secure/thesis/', views.admin_thesis_list, name='admin_thesis_list'),
-path('admin-panel-2026-secure/thesis/<int:pk>/', views.admin_thesis_detail, name='admin_thesis_detail'),
-path('admin-panel-2026-secure/thesis/upload/', views.admin_thesis_upload, name='admin_thesis_upload'),
-path('admin-panel-2026-secure/thesis/<int:pk>/download/', views.admin_thesis_download, name='admin_thesis_download'),
-path('admin-panel-2026-secure/thesis/<int:pk>/view-pdf/', views.admin_thesis_view_pdf, name='admin_thesis_view_pdf'),
-path('admin-panel-2026-secure/thesis/<int:pk>/delete/', views.admin_thesis_delete_confirm, name='admin_thesis_delete'),
-path('admin-panel-2026-secure/thesis/<int:pk>/update-status/', views.admin_thesis_update_status, name='admin_thesis_update_status'),
-path('admin-panel-2026-secure/thesis/<int:pk>/assign-examiners/', views.admin_thesis_assign_examiners, name='admin_thesis_assign_examiners'),
-path('admin-panel-2026-secure/thesis/<int:pk>/record-viva/', views.admin_thesis_record_viva, name='admin_thesis_record_viva'),
-path('admin-panel-2026-secure/thesis/<int:pk>/finalize/', views.admin_thesis_finalize, name='admin_thesis_finalize'),
+    # ===== ADMIN THESIS MANAGEMENT (ENHANCED) =====
+    path('admin-panel-2026-secure/thesis/', views.admin_thesis_list, name='admin_thesis_list'),
+    path('admin-panel-2026-secure/thesis/<int:pk>/', views.admin_thesis_detail, name='admin_thesis_detail'),
+    path('admin-panel-2026-secure/thesis/upload/', views.admin_thesis_upload, name='admin_thesis_upload'),
+    path('admin-panel-2026-secure/thesis/<int:pk>/download/', views.admin_thesis_download, name='admin_thesis_download'),
+    path('admin-panel-2026-secure/thesis/<int:pk>/view-pdf/', views.admin_thesis_view_pdf, name='admin_thesis_view_pdf'),
+    path('admin-panel-2026-secure/thesis/<int:pk>/delete/', views.admin_thesis_delete_confirm, name='admin_thesis_delete'),
+    path('admin-panel-2026-secure/thesis/<int:pk>/update-status/', views.admin_thesis_update_status, name='admin_thesis_update_status'),
+    path('admin-panel-2026-secure/thesis/<int:pk>/assign-examiners/', views.admin_thesis_assign_examiners, name='admin_thesis_assign_examiners'),
+    path('admin-panel-2026-secure/thesis/<int:pk>/record-viva/', views.admin_thesis_record_viva, name='admin_thesis_record_viva'),
+    path('admin-panel-2026-secure/thesis/<int:pk>/finalize/', views.admin_thesis_finalize, name='admin_thesis_finalize'),
+
     # ===== ADMIN PROGRESS REPORTS MANAGEMENT =====
     path('admin-panel-2026-secure/progress/', views.admin_progress_list, name='admin_progress_list'),
     path('admin-panel-2026-secure/progress/<int:pk>/', views.admin_progress_detail, name='admin_progress_detail'),
 
     # ===== ADMIN MEETING MANAGEMENT (ENHANCED) =====
-path('admin-panel-2026-secure/meetings/', views.admin_meeting_list, name='admin_meeting_list'),
-path('admin-panel-2026-secure/meetings/create/', views.admin_meeting_create, name='admin_meeting_create'),
-path('admin-panel-2026-secure/meetings/<int:pk>/', views.admin_meeting_detail, name='admin_meeting_detail'),
-path('admin-panel-2026-secure/meetings/<int:pk>/edit/', views.admin_meeting_edit, name='admin_meeting_edit'),
-path('admin-panel-2026-secure/meetings/<int:pk>/delete/', views.admin_meeting_delete_confirm, name='admin_meeting_delete'),
+    path('admin-panel-2026-secure/meetings/', views.admin_meeting_list, name='admin_meeting_list'),
+    path('admin-panel-2026-secure/meetings/create/', views.admin_meeting_create, name='admin_meeting_create'),
+    path('admin-panel-2026-secure/meetings/<int:pk>/', views.admin_meeting_detail, name='admin_meeting_detail'),
+    path('admin-panel-2026-secure/meetings/<int:pk>/edit/', views.admin_meeting_edit, name='admin_meeting_edit'),
+    path('admin-panel-2026-secure/meetings/<int:pk>/delete/', views.admin_meeting_delete_confirm, name='admin_meeting_delete'),
+
     # ===== ADMIN EXAMINER MANAGEMENT =====
     path('admin-panel-2026-secure/examiners/', views.admin_examiner_list, name='admin_examiner_list'),
     path('admin-panel-2026-secure/examiners/create/', views.admin_examiner_create, name='admin_examiner_create'),
@@ -80,17 +88,17 @@ path('admin-panel-2026-secure/meetings/<int:pk>/delete/', views.admin_meeting_de
     path('admin-panel-2026-secure/extensions/<int:pk>/reject/', views.admin_extension_reject, name='admin_extension_reject'),
 
     # ===== ADMIN DEGREE LETTER MANAGEMENT (ENHANCED) =====
-path('admin-panel-2026-secure/degree/', views.admin_degree_list, name='admin_degree_list'),
-path('admin-panel-2026-secure/degree/<int:pk>/', views.admin_degree_detail, name='admin_degree_detail'),
-path('admin-panel-2026-secure/degree/upload/', views.admin_degree_upload, name='admin_degree_upload'),
-path('admin-panel-2026-secure/degree/<int:pk>/download/', views.admin_degree_download, name='admin_degree_download'),
-path('admin-panel-2026-secure/degree/<int:pk>/view-pdf/', views.admin_degree_view_pdf, name='admin_degree_view_pdf'),
-path('admin-panel-2026-secure/degree/<int:pk>/delete/', views.admin_degree_delete_confirm, name='admin_degree_delete'),
-path('admin-panel-2026-secure/degree/<int:pk>/verify/', views.admin_degree_verify, name='admin_degree_verify'),
-path('admin-panel-2026-secure/degree/<int:pk>/issue/', views.admin_degree_issue, name='admin_degree_issue'),
+    path('admin-panel-2026-secure/degree/', views.admin_degree_list, name='admin_degree_list'),
+    path('admin-panel-2026-secure/degree/<int:pk>/', views.admin_degree_detail, name='admin_degree_detail'),
+    path('admin-panel-2026-secure/degree/upload/', views.admin_degree_upload, name='admin_degree_upload'),
+    path('admin-panel-2026-secure/degree/<int:pk>/download/', views.admin_degree_download, name='admin_degree_download'),
+    path('admin-panel-2026-secure/degree/<int:pk>/view-pdf/', views.admin_degree_view_pdf, name='admin_degree_view_pdf'),
+    path('admin-panel-2026-secure/degree/<int:pk>/delete/', views.admin_degree_delete_confirm, name='admin_degree_delete'),
+    path('admin-panel-2026-secure/degree/<int:pk>/verify/', views.admin_degree_verify, name='admin_degree_verify'),
+    path('admin-panel-2026-secure/degree/<int:pk>/issue/', views.admin_degree_issue, name='admin_degree_issue'),
 
     # ============================================
-    # ========== 📄 ADMIN STUDENT DOCUMENTS (NEW) ==========
+    # ========== 📄 ADMIN STUDENT DOCUMENTS ==========
     # ============================================
     path('admin-panel-2026-secure/documents/', views.admin_document_list, name='admin_document_list'),
     path('admin-panel-2026-secure/documents/upload/', views.admin_document_upload, name='admin_document_upload'),
@@ -186,7 +194,7 @@ path('admin-panel-2026-secure/degree/<int:pk>/issue/', views.admin_degree_issue,
     # ===== STUDENT DEGREE LETTER =====
     path('student/degree/request/', views.student_degree_request, name='student_degree_request'),
     
-    # ===== 📄 STUDENT DOCUMENTS (NEW) =====
+    # ===== 📄 STUDENT DOCUMENTS =====
     path('student/documents/', views.student_documents, name='student_documents'),
     
     # ===== STUDENT PROFILE =====

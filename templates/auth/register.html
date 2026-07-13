@@ -23,7 +23,7 @@
 <!-- ===== NAVBAR ===== -->
 <nav class="navbar" id="navbar">
     <div class="nav-left">
-        <!-- Logo image hata diya -->
+        <img src="{% static 'images/logo.png' %}" alt="GRMS Logo" class="logo">
         <span class="brand-name">GRMS</span>
     </div>
     <div class="nav-right">
@@ -52,6 +52,7 @@
     <a href="{% url 'login' %}" class="mobile-login">Login</a>
 </div>
 
+<!-- ===== REGISTER FORM ===== -->
 <div class="auth-container">
     <div class="auth-card register-card" data-aos="fade-up">
         <div class="auth-header">
@@ -59,10 +60,21 @@
             <p>Join GRMS research community</p>
         </div>
         
-        <form method="post" class="auth-form" id="registerForm">
+        <!-- ✅ Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- ✅ Form with CSRF Token -->
+        <form method="post" action="{% url 'register' %}" class="auth-form" id="registerForm">
             {% csrf_token %}
             
-            <!-- Full Name Field -->
+            <!-- Full Name -->
             <div class="input-group">
                 <i class="fas fa-user"></i>
                 <input type="text" name="fullname" placeholder="Full Name" required>
@@ -72,7 +84,7 @@
                 Enter your full name as per university record
             </div>
             
-            <!-- Username Field -->
+            <!-- Username -->
             <div class="input-group">
                 <i class="fas fa-user-tag"></i>
                 <input type="text" name="username" placeholder="Username" required>
@@ -82,7 +94,7 @@
                 Choose a unique username (letters, numbers, and underscore only)
             </div>
             
-            <!-- Email Field -->
+            <!-- Email -->
             <div class="input-group">
                 <i class="fas fa-envelope"></i>
                 <input type="email" name="email" placeholder="Email Address" required>
@@ -92,7 +104,7 @@
                 Use your university email or personal email
             </div>
             
-            <!-- Role Field - Examiner Option Added -->
+            <!-- Role -->
             <div class="input-group">
                 <i class="fas fa-user-graduate"></i>
                 <select name="role" required>
@@ -100,6 +112,7 @@
                     <option value="Student">Student</option>
                     <option value="Supervisor">Supervisor</option>
                     <option value="Examiner">Examiner</option>
+                    <option value="Admin">Admin</option>
                 </select>
             </div>
             <div class="field-guidance">
@@ -107,7 +120,7 @@
                 Select your role - Student for researchers, Supervisor for faculty members, Examiner for thesis evaluation
             </div>
             
-            <!-- Password Field -->
+            <!-- Password -->
             <div class="input-group">
                 <i class="fas fa-lock"></i>
                 <input type="password" name="password" id="password" placeholder="Password" required>
@@ -117,7 +130,7 @@
                 Minimum 8 characters with at least 1 uppercase, 1 lowercase, and 1 number
             </div>
             
-            <!-- Confirm Password Field -->
+            <!-- Confirm Password -->
             <div class="input-group">
                 <i class="fas fa-lock"></i>
                 <input type="password" name="confirm_password" id="confirmPassword" placeholder="Confirm Password" required>
@@ -152,6 +165,36 @@
     AOS.init({
         duration: 1000,
         once: true
+    });
+    
+    // ✅ Password Match Check
+    document.addEventListener('DOMContentLoaded', function() {
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const indicator = document.getElementById('passwordMatchIndicator');
+        const guidance = document.getElementById('passwordMatchGuidance');
+        
+        function checkPasswordMatch() {
+            if (password.value && confirmPassword.value) {
+                if (password.value === confirmPassword.value) {
+                    indicator.style.display = 'block';
+                    indicator.style.color = 'green';
+                    indicator.innerHTML = '<i class="fas fa-check-circle"></i> Passwords match';
+                    guidance.style.display = 'none';
+                } else {
+                    indicator.style.display = 'block';
+                    indicator.style.color = 'red';
+                    indicator.innerHTML = '<i class="fas fa-times-circle"></i> Passwords do not match';
+                    guidance.style.display = 'none';
+                }
+            } else {
+                indicator.style.display = 'none';
+                guidance.style.display = 'block';
+            }
+        }
+        
+        password.addEventListener('input', checkPasswordMatch);
+        confirmPassword.addEventListener('input', checkPasswordMatch);
     });
 </script>
 </body>

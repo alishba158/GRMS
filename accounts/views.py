@@ -405,6 +405,10 @@ def admin_dashboard(request):
     except:
         available_supervisors = 0
     
+    # ✅ Get notifications for admin
+    notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')[:10]
+    unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+    
     # Regular request - return full page
     context = {
         'total_students': students.count(),
@@ -418,10 +422,11 @@ def admin_dashboard(request):
         'pending_extensions': 0,
         'urgent_extensions': 0,
         'pending_degree_requests': 0,
-        'unread_count': Notification.objects.filter(user=request.user, is_read=False).count(),
+        'unread_count': unread_count,
         'departments': departments,
         'filtered_students': filtered_students,
         'selected_dept': selected_dept,
+        'notifications': notifications,
     }
     
     return render(request, 'admin/dashboard.html', context)
@@ -895,15 +900,15 @@ def student_dashboard(request):
     recent_meetings = Meeting.objects.filter(student=student).order_by('-meeting_date')[:5]
     recent_extensions = ExtensionCase.objects.filter(student=student).order_by('-request_date')[:5]
     
+    # ✅ Get notifications for student
+    notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')[:10]
+    unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+    
     # Upcoming meetings (future only)
     upcoming_meetings = Meeting.objects.filter(
         student=student,
         meeting_date__gte=timezone.now()
     ).order_by('meeting_date')[:5]
-    
-    # Notifications
-    unread_notifications = Notification.objects.filter(user=request.user, is_read=False)[:5]
-    unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
     
     context = {
         'student': student,
@@ -917,7 +922,7 @@ def student_dashboard(request):
         'recent_meetings': recent_meetings,
         'recent_extensions': recent_extensions,
         'upcoming_meetings': upcoming_meetings,
-        'unread_notifications': unread_notifications,
+        'notifications': notifications,
         'unread_count': unread_count,
     }
     return render(request, 'student/dashboard.html', context)
@@ -2118,6 +2123,14 @@ def admin_degree_issue(request, pk):
         return redirect('admin_degree_detail', pk=degree.id)
 
     # Generate PDF
+    import io
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.units import inch
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.lib import colors
+    
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)
     styles = getSampleStyleSheet()
@@ -2448,3 +2461,119 @@ def student_documents(request):
         'student': student,
     }
     return render(request, 'student/documents.html', context)
+
+
+# =================================================
+# ========== FORGET PASSWORD - ADMIN MANUAL RESET ==========
+# =================================================
+
+def forget_password_request(request):
+    """User requests admin to reset password"""
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        
+        try:
+            user = User.objects.get(username=username, email=email)
+            
+            # ✅ Create notification for all admins
+            admin_users = User.objects.filter(is_superuser=True)
+            notification_count = 0
+            for admin in admin_users:
+                Notification.objects.create(
+                    user=admin,
+                    notification_type='System',
+                    message=f"🔑 Password reset requested by {user.username} ({user.email})",
+                    is_read=False,
+                    link=f"/admin-panel-2026-secure/reset-password/{user.id}/"
+                )
+                notification_count += 1
+            
+            if notification_count > 0:
+                messages.success(request, "✅ Password reset request sent to admin! You will be notified.")
+            else:
+                messages.warning(request, "⚠️ No admin found. Please contact system administrator.")
+                
+        except User.DoesNotExist:
+            messages.error(request, "❌ No account found with these credentials! Please check username and email.")
+        
+        return redirect('forget_password')
+    
+    return render(request, 'auth/forget_password.html')
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_reset_user_password(request, user_id):
+    """Admin manually reset user password with email notification"""
+    user = get_object_or_404(User, pk=user_id)
+    
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if new_password != confirm_password:
+            messages.error(request, "❌ Passwords do not match!")
+            return redirect('admin_reset_user_password', user_id=user_id)
+        
+        if len(new_password) < 8:
+            messages.error(request, "❌ Password must be at least 8 characters!")
+            return redirect('admin_reset_user_password', user_id=user_id)
+        
+        # Reset password
+        user.set_password(new_password)
+        user.save()
+        
+        # ✅ Send Email to User
+        try:
+            from django.core.mail import send_mail
+            subject = "🔑 Password Reset by Admin - GRMS"
+            message = f"""
+Hello {user.get_full_name() or user.username},
+
+Your password has been reset by the administrator.
+
+New Password: {new_password}
+
+Please login and change your password immediately.
+
+Login: http://localhost:8000/login/
+
+Thanks,
+GRMS Team
+            """
+            send_mail(
+                subject,
+                message,
+                'fuuastislamabad1@gmail.com',
+                [user.email],
+                fail_silently=False,
+            )
+            email_sent = True
+            print(f"✅ Email sent to {user.email}")
+        except Exception as e:
+            email_sent = False
+            print(f"❌ Email error: {e}")
+        
+        # ✅ Notify user (System Notification)
+        Notification.objects.create(
+            user=user,
+            notification_type='System',
+            message=f"✅ Your password has been reset by admin. Please check your email for new password.",
+            is_read=False,
+            link=f"/login/"
+        )
+        
+        if email_sent:
+            messages.success(request, f"✅ Password reset successfully for {user.username}! Email sent.")
+        else:
+            messages.warning(request, f"✅ Password reset successfully for {user.username}! But email could not be sent.")
+        
+        return redirect('admin_student_list')
+    
+    context = {
+        'user': user,
+        'username': user.username,
+        'full_name': user.get_full_name(),
+    }
+    return render(request, 'admin/reset_password.html', context)

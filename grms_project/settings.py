@@ -20,6 +20,7 @@ DEBUG = True  # ✅ Change to True for development
 # ✅ ALLOWED HOSTS
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
 
+CSRF_TRUSTED_ORIGINS = ['https://grms-production.up.railway.app']
 # ============================================
 # ===== APPLICATION DEFINITION =====
 # ============================================
